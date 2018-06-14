@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Singlestone_JBD_061318", "Singlestone_JBD_061318\Singlestone_JBD_061318.csproj", "{2016AD4D-32E0-4FD3-BA85-6919428C81C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Singlestone_JBD_061318.Tests", "Singlestone_JBD_061318.Tests\Singlestone_JBD_061318.Tests.csproj", "{EE062D64-3F4D-40F0-B1BB-4B19F78B1801}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2016AD4D-32E0-4FD3-BA85-6919428C81C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2016AD4D-32E0-4FD3-BA85-6919428C81C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2016AD4D-32E0-4FD3-BA85-6919428C81C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2016AD4D-32E0-4FD3-BA85-6919428C81C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE062D64-3F4D-40F0-B1BB-4B19F78B1801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE062D64-3F4D-40F0-B1BB-4B19F78B1801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE062D64-3F4D-40F0-B1BB-4B19F78B1801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE062D64-3F4D-40F0-B1BB-4B19F78B1801}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
