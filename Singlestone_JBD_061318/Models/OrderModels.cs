@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiteDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,6 +8,7 @@ namespace Singlestone_JBD_061318.Models
 {
     public class Order
     {
+        [BsonId]
         public int Id { get; set; }
         public string CustomerId { get; set; }
         public List<Item> Items { get; set; }
@@ -18,9 +20,10 @@ namespace Singlestone_JBD_061318.Models
 
     public class Item
     {
+        public int Id { get; set; }
         public string ProductId { get; set; }
-        public int Quantity { get; set; }
         public Product Product { get; set; }
+        public int Quantity { get; set; }
         public double Sum
         {
             get { return ((this.Product?.Price ?? 0.0) * this.Quantity); }

@@ -1,7 +1,9 @@
 ﻿using LiteDB;
+using Singlestone_JBD_061318.Helpers;
 using Singlestone_JBD_061318.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
@@ -12,53 +14,54 @@ namespace Singlestone_JBD_061318.Controllers
     public class OrdersController : Controller
     {
         [HttpGet]
-        public JsonResult Get(string id)
+        public JsonResult Get(int id = 0)
         {
-            using (var db = new LiteDatabase(@"Order.db"))
+            if (id != 0)
             {
-                if(!string.IsNullOrWhiteSpace(id))
-                {
-                    var order = db.GetCollection<Order>("orders").Find(s => s.Id == Int32.Parse(id)).FirstOrDefault();
-                    return new JsonResult() { Data = order, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-                }
-                var orders = db.GetCollection<Order>("orders").FindAll().OrderBy(s => s.CustomerId).OrderBy(s => s.Id);
-                return new JsonResult() { Data = orders, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                return new JsonResult() { Data = DBHelper.GetOrder(id), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
+            return new JsonResult() { Data = DBHelper.GetAllOrders(), JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+
         }
 
         [HttpPost]
         public JsonResult Create(Order newOrder)
         {
-            HttpClient client = new HttpClient()
-            {
-                BaseAddress = new Uri("https://petstoreapp.azurewebsites.net/")
-            };
+            Customer cust = DBHelper.GetCustomer(newOrder.CustomerId);
 
+            if (cust == null)
+            {
+                cust = new Customer(newOrder.CustomerId);
+                DBHelper.CreateCustomer(cust);
+            }
+
+            Uri baseAddress = new Uri(ConfigurationManager.AppSettings["ProductAPIUri"]);
             foreach (var item in newOrder.Items)
             {
-                var request = client.GetAsync($"api/products/{item.ProductId}").Result;
+                var request = HttpHelper.GetResponse(baseAddress, $"api/products/{item.ProductId}");
                 if (request.IsSuccessStatusCode)
                 {
                     item.Product = request.Content.ReadAsAsync<Product>().Result;
                 }
             }
 
-            using (var db = new LiteDatabase(@"Order.db"))
+            var order = new Order
             {
-                var orders = db.GetCollection<Order>("orders");
-                var order = new Order
-                {
-                    CustomerId = newOrder.CustomerId,
-                    Items = newOrder.Items
-                };
+                CustomerId = newOrder.CustomerId,
+                Items = newOrder.Items
+            };
 
-                orders.Insert(order);
-
-                OrderReceipt receipt = new OrderReceipt(order);
-                return new JsonResult() { Data = receipt, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            DBHelper.CreateOrder(order);
+            if (cust.Orders == null)
+            {
+                cust.Orders = new List<Order>();
             }
+            cust.Orders.Add(order);
+            DBHelper.UpdateCustomer(cust);
+            OrderReceipt receipt = new OrderReceipt(order);
+            return new JsonResult() { Data = receipt, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
-        
+
 
     }
 }
