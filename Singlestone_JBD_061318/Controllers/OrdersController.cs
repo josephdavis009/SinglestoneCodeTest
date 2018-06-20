@@ -27,16 +27,37 @@ namespace Singlestone_JBD_061318.Controllers
         [HttpPost]
         public JsonResult Create(Order newOrder)
         {
-            Customer cust = DBHelper.GetCustomer(newOrder.CustomerId);
+            Customer cust = GetCustomer(newOrder.CustomerId);
+            
+            var order = new Order
+            {
+                CustomerId = newOrder.CustomerId,
+                Items = SyncProducts(newOrder)
+            };
+
+            DBHelper.CreateOrder(order);
+            UpdateCustomerOrders(cust, order);
+
+            OrderReceipt receipt = new OrderReceipt(order);
+            return new JsonResult() { Data = receipt, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
+
+        private Customer GetCustomer(string customerId)
+        {
+            Customer cust = DBHelper.GetCustomer(customerId);
 
             if (cust == null)
             {
-                cust = new Customer(newOrder.CustomerId);
+                cust = new Customer(customerId);
                 DBHelper.CreateCustomer(cust);
             }
+            return cust;
+        }
 
+        private List<Item> SyncProducts(Order order)
+        {
             Uri baseAddress = new Uri(ConfigurationManager.AppSettings["ProductAPIUri"]);
-            foreach (var item in newOrder.Items)
+            foreach (var item in order.Items)
             {
                 var request = HttpHelper.GetResponse(baseAddress, $"api/products/{item.ProductId}");
                 if (request.IsSuccessStatusCode)
@@ -44,24 +65,18 @@ namespace Singlestone_JBD_061318.Controllers
                     item.Product = request.Content.ReadAsAsync<Product>().Result;
                 }
             }
+            return order.Items;
+        }
 
-            var order = new Order
-            {
-                CustomerId = newOrder.CustomerId,
-                Items = newOrder.Items
-            };
-
-            DBHelper.CreateOrder(order);
+        private void UpdateCustomerOrders(Customer cust, Order order)
+        {
             if (cust.Orders == null)
             {
                 cust.Orders = new List<Order>();
             }
             cust.Orders.Add(order);
             DBHelper.UpdateCustomer(cust);
-            OrderReceipt receipt = new OrderReceipt(order);
-            return new JsonResult() { Data = receipt, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
-
 
     }
 }

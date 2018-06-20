@@ -14,7 +14,7 @@ namespace Singlestone_JBD_061318.Tests
             double p1 = 0.33;
             int q1 = 10;
             Product testProduct = new Product() { Name = "Test", Category = "Test item", Id = "p1", Price = p1 };
-            Item testItem = new Item() { Product = testProduct, ProductId = "p1", Quantity = q1 };
+            Item testItem = new Item() { Product = testProduct, Quantity = q1 };
             Assert.AreEqual((p1 * q1), testItem.Sum, 0, "Item sum is incorrect");
         }
 
